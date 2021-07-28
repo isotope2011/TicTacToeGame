@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React, { useCallback, useEffect, useState } from "react";
 import _set from "lodash/set";
 import UserControls from "./components/user_controls";
@@ -65,40 +66,37 @@ const gameController = (data, setData) => {
         choice: userPick,
         type: USER,
       };
-    }
-    else if (isPaper(oppoPick)) {
+    } else if (isPaper(oppoPick)) {
       winner = {
         name: data[OPPO].name,
         choice: oppoPick,
         type: OPPO,
       };
     }
-  }
-  else if (isPaper(userPick)) {   // User is Paper
+  } else if (isPaper(userPick)) {
+    // User is Paper
     if (isRock(oppoPick)) {
       winner = {
         name: data[USER].name,
         choice: userPick,
         type: USER,
       };
-    }
-    else if (isScissors(oppoPick)) {
+    } else if (isScissors(oppoPick)) {
       winner = {
         name: data[OPPO].name,
         choice: oppoPick,
         type: OPPO,
       };
     }
-  }
-  else if (isScissors(userPick)) {   // User is Scissors
+  } else if (isScissors(userPick)) {
+    // User is Scissors
     if (isPaper(oppoPick)) {
       winner = {
         name: data[USER].name,
         choice: userPick,
         type: USER,
       };
-    }
-    else if (isRock(oppoPick)) {
+    } else if (isRock(oppoPick)) {
       winner = {
         name: data[OPPO].name,
         choice: oppoPick,
@@ -106,38 +104,35 @@ const gameController = (data, setData) => {
       };
     }
   }
-  
-  if (winner === null) { // same pick
+
+  if (winner === null) {
+    // same pick
     winner = {
-      isDraw: true
-    }
-  }
-  else {
+      isDraw: true,
+    };
+  } else {
     if (winner.type === USER) {
-      data[USER].score = data[USER].score+1;
-    }
-    else {
-      data[OPPO].score = data[OPPO].score+1;
+      data[USER].score = data[USER].score + 1;
+    } else {
+      data[OPPO].score = data[OPPO].score + 1;
     }
   }
 
   data.winner = winner;
 
-  console.log('game data', data);
+  console.log("game data", data);
 
   setData(data);
 };
+
+const RandomIndex = () => Math.floor(Math.random() * 7);
 
 function App({ gameId }) {
   const [data, setData] = useState(initGameData(gameId));
   const [message, setMessage] = useState(null);
   const [isUpdated, setUpdated] = useState(false);
-
-  const {
-    userTotal,
-    oppoTotal,
-    currentRound,
-  } = data;
+  const [randomImg, setImg] = useState(null);
+  const { userTotal, oppoTotal, currentRound } = data;
 
   const update = useCallback(
     (key, val) => {
@@ -150,37 +145,37 @@ function App({ gameId }) {
 
   useEffect(() => {
     if (isUpdated) {
-      console.log('activity', data);
+      console.log("activity", data);
       setUpdated(false);
     }
-  }, [data, isUpdated])
+  }, [data, isUpdated]);
 
   useEffect(() => {
     const userPicked = data.user.isPicked;
     const oppoPicked = data.opponent.isPicked;
 
-    console.log('ispicked', userPicked, oppoPicked);
+    console.log("ispicked", userPicked, oppoPicked);
 
     if (userPicked && oppoPicked) {
       // check game logic
       gameController(data, setData);
     }
-
   }, [data, data.opponent.isPicked, data.user.isPicked]);
 
   useEffect(() => {
-    console.log('is winner', data.winner)
+    console.log("is winner", data.winner);
     if (data.winner) {
-      if(data.winner.isDraw) {
-        setMessage('Its a Draw!')
-      }
-      else {
+      if (data.winner.isDraw) {
+        setMessage("Its a Draw!");
+      } else {
         const { name, choice } = data.winner;
+        const image = require(`./components/assets/${choice.toLowerCase()}.${RandomIndex()}.jpg`);
+        console.log({ image });
+        setImg(image.default);
         setMessage(`${name}'s ${choice} Wins!`);
       }
     }
-  },
-  [data.winner]);
+  }, [data.winner]);
 
   return (
     <div className="game-app">
@@ -195,7 +190,9 @@ function App({ gameId }) {
             </div>
 
             <div className="row round">
-              <div className="col text-center">{`Round ${currentRound + 1}`}</div>
+              <div className="col text-center">{`Round ${
+                currentRound + 1
+              }`}</div>
             </div>
 
             <div className="row scores mx-1">
@@ -208,6 +205,16 @@ function App({ gameId }) {
         <main>
           {message && (
             <div className="container text-center display-choice">
+              <div>
+                <img
+                  src={randomImg}
+                  style={{
+                    width: 125,
+                    height: 125,
+                    borderRadius: 125,
+                  }}
+                />
+              </div>
               {message}
             </div>
           )}
@@ -220,6 +227,11 @@ function App({ gameId }) {
               <div className="col-5">
                 <UserControls {...{ user: opponent, update }} />
               </div>
+            </div>
+          </div>
+          <div className="row text-center">
+            <div className="col-12">
+              <button className="btn btn-secondary btn-lg">Play Again?</button>
             </div>
           </div>
         </main>
